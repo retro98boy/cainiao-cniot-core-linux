@@ -162,6 +162,8 @@ dd if=path-to-fip-with-mainline-uboot.bin of=/dev/mmcblk1boot1 bs=512 seek=1
 
 如果无法获得设备上已有系统的root用户权限，可以使用Amlogic USB Burning Tool搭配制作的USB刷写包fip-with-mainline-uboot.burn.img来直接将主线U-Boot刻录到eMMC。USB下载流程见**USB下载模式刻录eMMC**
 
+> Amlogic USB Burning Tool会将FIP写入到eMMC的boot area
+
 ## 写入系统镜像
 
 ### 写入系统镜像到U盘
