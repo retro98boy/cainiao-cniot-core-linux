@@ -1,3 +1,9 @@
+# 固件
+
+[Armbian](https://github.com/retro98boy/cainiao-cniot-core-linux/releases)
+
+[Batocera](https://github.com/retro98boy/batocera.linux)
+
 # 硬件
 
 菜鸟物流终端A311D版，可拆成主机和底座两个部分
