@@ -14,7 +14,7 @@
 
 Amlogic A311D SoC，2 GB DDR，16 GB eMMC
 
-无SD卡槽，所以A311D只能从eMMC加载FIP
+无TF卡槽，所以A311D只能从eMMC加载FIP
 
 千兆网口和RTL8822CS WiFi/BT
 
@@ -51,11 +51,18 @@ eMMC短接点
 aml_image_v2_packer -d CAINIAO_A311D_RTL8211F_FLINK6222B_2G_原机全分区线刷救砖包仅加当贝桌面.img burn-img-extract
 ```
 
-也可以尝试在开机的设备上直接使用dd命令复制eMMC boot area的FIP：
+也可以尝试在开机的设备上直接使用dd命令提取eMMC上的FIP
+
+一般user area和boot area的FIP相同，二选一即可：
 
 ```
+# boot area
 # 如果是Android，需要改为/dev/block/mmcblk1boot0
-dd if=/dev/mmcblk1boot0 of=somewhere/vendor-fip bs=1024 count=4 status=progress
+dd if=/dev/mmcblk1boot0 of=somewhere/vendor-fip bs=512 skip=1
+
+# user area
+# 如果是Android，需要改为/dev/block/mmcblk1
+dd if=/dev/mmcblk1 of=somewhere/vendor-fip bs=512 skip=1 count=8192
 ```
 
 然后使用[gxlimg](https://github.com/repk/gxlimg)解包FIP：
@@ -95,7 +102,7 @@ gxlimg \
 
 # 主线内核
 
-该设备的[DTS](https://github.com/retro98boy/armbian-build/blob/cainiao-cniot-core/patch/kernel/archive/meson64-6.12/dt/meson-g12b-a311d-cainiao-cniot-core.dts)
+该设备的[dts](https://github.com/retro98boy/armbian-build/blob/cainiao-cniot-core/patch/kernel/archive/meson64-6.12/dt/meson-g12b-a311d-cainiao-cniot-core.dts)
 
 ## 外设工作情况
 
@@ -168,7 +175,7 @@ dd if=path-to-fip-with-mainline-uboot.bin of=/dev/mmcblk1boot1 bs=512 seek=1
 
 如果无法获得设备上已有系统的root用户权限，可以使用Amlogic USB Burning Tool搭配制作的USB刷写包fip-with-mainline-uboot.burn.img来直接将主线U-Boot刻录到eMMC。USB下载流程见**USB下载模式刻录eMMC**
 
-> Amlogic USB Burning Tool会将FIP写入到eMMC的boot area
+> Amlogic USB Burning Tool会将FIP同时写入到eMMC的user area和boot area
 
 ## 写入系统镜像
 
