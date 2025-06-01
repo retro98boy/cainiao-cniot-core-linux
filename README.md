@@ -20,6 +20,21 @@ Amlogic A311D SoC，2 GB DDR，16 GB eMMC
 
 一个USB Type-C用于在USB下载模式下供电和传输数据。主机和底座一起使用时，该Type-C是否可以在Linux系统下用作Host未知，因为它被底座挡住而难以插入设备测试
 
+主机侧边存在4个金属触点，为内部连接器导出，用途未知
+
+![side-connector](pictures/side-connector.jpg)
+
+![four-dots](pictures/four-dots.jpg)
+
+| 内部连接器 | 侧边金属触点 |              |
+|----------|------------|--------------|
+| 1        |            | GPIOH_4      |
+| 2        | 1          | GND          |
+| 3        | 4          | 无电压？非GND |
+| 4        | 3          | 无电压？非GND |
+| 5        | 2          | 总是5V？     |
+| 6        |            | 总是5V？     |
+
 ## 底座
 
 底座有不同型号，但软件应该通用
@@ -75,6 +90,7 @@ gxlimg -e vendor-fip fip
 
 ```
 rm fip/bl33.enc
+# 这一步可能存在Bug，见下文的替换步骤
 gxlimg -t bl3x -s path-to-u-boot.bin fip/bl33.enc
 gxlimg \
 -t fip \
@@ -94,7 +110,9 @@ gxlimg \
 --rev v3 fip-with-mainline-uboot.bin
 ```
 
-> [当前版本](https://github.com/repk/gxlimg/tree/0d0e5ba9cf396d1338067e8dc37a8bcd2e6874f1)的gxlimg似乎有Bug，在调试的时候，打包出来的FIP不可用，通过减小输出的bin文件解决了（关掉一些没用的config）
+> [当前版本](https://github.com/repk/gxlimg/tree/0d0e5ba9cf396d1338067e8dc37a8bcd2e6874f1)的gxlimg有Bug，一些u-boot.bin在被处理后，打包出来的FIP不可用，随便调整下U-Boot的config，让编译出的u-boot.bin变化一下，就可能触发不了这个Bug
+>
+> 可使用[aml_encrypt_g12b](https://github.com/LibreELEC/amlogic-boot-fip/tree/master/khadas-vim3)来替代gxlimg处理u-boot.bin：aml_encrypt_g12b --bl3sig --input u-boot.bin --output fip/bl33.enc --level v3 --type bl33
 >
 > 似乎和这个[issues](https://github.com/repk/gxlimg/issues/19)相同
 >
