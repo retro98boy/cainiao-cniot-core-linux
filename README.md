@@ -1,6 +1,6 @@
 # 固件
 
-[Armbian](https://github.com/retro98boy/cainiao-cniot-core-linux/releases)
+[Armbian](https://github.com/armbian/community)
 
 [Batocera](https://github.com/retro98boy/batocera.linux)
 
@@ -14,26 +14,36 @@
 
 Amlogic A311D SoC，2 GB DDR，16 GB eMMC
 
-无TF卡槽，所以A311D只能从eMMC加载FIP
+无SD卡槽，所以A311D只能从eMMC加载FIP
 
 千兆网口和RTL8822CS WiFi/BT
 
-一个USB Type-C用于在USB下载模式下供电和传输数据。主机和底座一起使用时，该Type-C是否可以在Linux系统下用作Host未知，因为它被底座挡住而难以插入设备测试
+一个USB Type-C用于在USB下载模式下供电和传输数据
 
-主机侧边存在4个金属触点，为内部连接器导出，用途未知
+侧边存在金属触点形式的USB接口，和Type-C共用主机的USB 2.0总线，通过SGM7227切换，拉低GPIOA_14即可切换到侧边的USB触点，此时Type-C中的数据通道失效
+
+侧边还存在6 x WS2812 LED，通过GPIOH_4驱动，驱动见**呼吸灯**章节
 
 ![side-connector](pictures/side-connector.jpg)
 
 ![four-dots](pictures/four-dots.jpg)
 
-| 内部连接器 | 侧边金属触点 |              |
-|----------|------------|--------------|
-| 1        |            | GPIOH_4      |
-| 2        | 1          | GND          |
-| 3        | 4          | 无电压？非GND |
-| 4        | 3          | 无电压？非GND |
-| 5        | 2          | 总是5V？     |
-| 6        |            | 总是5V？     |
+![usb-a-pin](pictures/four-dots.jpg)
+
+| 内部连接器 | 侧边金属触点 |            |
+|----------|------------|------------|
+| 1        |            | GPIOH_4    |
+| 2        | 1          | GND        |
+| 3        | 4          | USB 2.0 D- |
+| 4        | 3          | USB 2.0 D+ |
+| 5        | 2          | USB 5V     |
+| 6        |            | LED 5V     |
+
+侧边面板内部构造：
+
+![rm-panel](pictures/rm-panel.jpg)
+
+![rm-panel2](pictures/rm-panel2.jpg)
 
 ## 底座
 
@@ -53,7 +63,7 @@ eMMC短接点
 
 # 主线U-Boot
 
-添加该设备支持的[patch](https://github.com/retro98boy/armbian-build/blob/cainiao-cniot-core/patch/u-boot/v2025.04/board_cainiao-cniot-core/add-board-cainiao-cniot-core.patch)
+在[armbian/build](https://github.com/armbian/build)仓库搜索cainiao-cniot-core即可找到添加该设备支持的U-Boot补丁
 
 打上补丁后，使用`make cainiao-cniot-core_defconfig && make CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc)`编译得到u-boot.bin
 
@@ -120,25 +130,51 @@ gxlimg \
 
 # 主线内核
 
-该设备的[dts](https://github.com/retro98boy/armbian-build/blob/cainiao-cniot-core/patch/kernel/archive/meson64-6.12/dt/meson-g12b-a311d-cainiao-cniot-core.dts)
+在[armbian/build](https://github.com/armbian/build)仓库搜索cainiao-cniot-core即可找到该设备的主线内核dts
 
 ## 外设工作情况
 
-| Component          | Status                     |
-|--------------------|----------------------------|
-| GBE                | Working                    |
-| WiFi               | Working                    |
-| BT                 | Working                    |
-| PWM Fan            | Working                    |
-| eMMC               | Working                    |
-| USB                | Working                    |
-| HDMI Display       | Working                    |
-| HDMI Audio         | Working                    |
-| Internal Speaker   | Not Working                |
-| Power Button       | Working                    |
-| ADC Key            | Working                    |
-| Side Lights?       | Not Working                |
-| Four Dots on Side  | Not Working (USB? SPI?)    |
+| Component             | Status                     |
+|-----------------------|----------------------------|
+| GBE                   | Working                    |
+| WiFi                  | Working                    |
+| BT                    | Working                    |
+| PWM Fan               | Working                    |
+| eMMC                  | Working                    |
+| USB                   | Working                    |
+| HDMI Display          | Working                    |
+| HDMI Audio            | Working                    |
+| Internal Speaker      | Working                    |
+| Power Button          | Working                    |
+| ADC Key               | Working                    |
+| Breathing Light       | Working                    |
+| USB 2.0 Side Contacts | Working                    |
+
+## 音频
+
+测试命令：
+
+```
+# playback via HDMI
+aplay -D plughw:CNIoTCORE,0 /usr/share/sounds/alsa/Front_Center.wav
+
+# playback via internal speaker
+aplay -D plughw:CNIoTCORE,1 /usr/share/sounds/alsa/Front_Center.wav
+```
+
+## 呼吸灯
+
+主线内核将GPIOH_4复用成SPI MOSI，然后在user space通过操作spidev来控制呼吸灯，简单的demo在本仓库的breathing-light目录下，使用方法：
+
+```
+gcc -o ws2812 ws2812.c -lm && ./ws2812
+```
+
+可以在PC上交叉编译：
+
+```
+aarch64-linux-gnu-gcc --static -o ws2812-static-arm64 ws2812.c -lm
+```
 
 ## NPU
 
