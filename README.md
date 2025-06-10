@@ -20,7 +20,7 @@ Amlogic A311D SoC，2 GB DDR，16 GB eMMC
 
 一个USB Type-C用于在USB下载模式下供电和传输数据
 
-侧边存在金属触点形式的USB接口，和Type-C共用主机的USB 2.0总线，通过SGM7227切换，拉低GPIOA_14即可切换到侧边的USB触点，此时Type-C中的数据通道失效
+侧边存在金属触点形式的USB接口，和Type-C共用主机的USB 2.0总线，通过SGM7227切换，拉低GPIOA_14即可切换到侧边的USB触点，此时Type-C中的数据通道失效。如果要焊接，推荐先将触点的表面刮成粗糙状便于上锡
 
 侧边还存在6 x WS2812 LED，通过GPIOH_4驱动，驱动见**呼吸灯**章节
 
@@ -28,7 +28,7 @@ Amlogic A311D SoC，2 GB DDR，16 GB eMMC
 
 ![four-dots](pictures/four-dots.jpg)
 
-![usb-a-pin](pictures/four-dots.jpg)
+![usb-a-pin](pictures/usb-a-pin.jpg)
 
 | 内部连接器 | 侧边金属触点 |            |
 |----------|------------|------------|
@@ -53,7 +53,7 @@ Amlogic A311D SoC，2 GB DDR，16 GB eMMC
 
 ## 调试点位
 
-调试串口
+调试串口，焊接推荐专用细飞线
 
 ![debug-uart](pictures/debug-uart.jpg)
 
