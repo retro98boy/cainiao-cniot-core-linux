@@ -152,15 +152,140 @@ gxlimg \
 
 ## 音频
 
-测试命令：
+A311D的音频配置十分灵活，整个音频路径可见datasheet中的**Audio Path**章节
+
+主线内核使用axg-sound-card驱动，在用户层使用amixer/alsamixer配置好音频通路即可播放音乐
+
+使用`aplay -l`可以看见card有三个device，分别对应FRDDR_A，FRDDR_B，FRDDR_C
 
 ```
-# playback via HDMI
-aplay -D plughw:CNIoTCORE,0 /usr/share/sounds/alsa/Front_Center.wav
-
-# playback via internal speaker
-aplay -D plughw:CNIoTCORE,1 /usr/share/sounds/alsa/Front_Center.wav
+**** List of PLAYBACK Hardware Devices ****
+card 0: cainiaocniotcor [cainiao-cniot-core], device 0: fe.dai-link-0 (*) []
+  Subdevices: 0/1
+  Subdevice #0: subdevice #0
+card 0: cainiaocniotcor [cainiao-cniot-core], device 1: fe.dai-link-1 (*) []
+  Subdevices: 0/1
+  Subdevice #0: subdevice #0
+card 0: cainiaocniotcor [cainiao-cniot-core], device 2: fe.dai-link-2 (*) []
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
 ```
+
+将音频路由恢复到关闭状态：
+
+```
+amixer -D hw:cainiaocniotcor cset name='ACODEC Playback Volume' 0
+amixer -D hw:cainiaocniotcor cset name='ACODEC Left DAC Sel' 'Left'
+amixer -D hw:cainiaocniotcor cset name='ACODEC Mute Ramp Switch' off
+amixer -D hw:cainiaocniotcor cset name='ACODEC Playback Channel Mode' 'Stereo'
+amixer -D hw:cainiaocniotcor cset name='ACODEC Ramp Rate' 'Fast'
+amixer -D hw:cainiaocniotcor cset name='ACODEC Right DAC Sel' 'Right'
+amixer -D hw:cainiaocniotcor cset name='ACODEC Unmute Ramp Switch' off
+amixer -D hw:cainiaocniotcor cset name='ACODEC Volume Ramp Switch' off
+amixer -D hw:cainiaocniotcor cset name='FRDDR_A SINK 1 SEL' 'OUT 0'
+amixer -D hw:cainiaocniotcor cset name='FRDDR_A SINK 2 SEL' 'OUT 0'
+amixer -D hw:cainiaocniotcor cset name='FRDDR_A SINK 3 SEL' 'OUT 0'
+amixer -D hw:cainiaocniotcor cset name='FRDDR_A SRC 1 EN Switch' off
+amixer -D hw:cainiaocniotcor cset name='FRDDR_A SRC 2 EN Switch' off
+amixer -D hw:cainiaocniotcor cset name='FRDDR_A SRC 3 EN Switch' off
+amixer -D hw:cainiaocniotcor cset name='FRDDR_B SINK 1 SEL' 'OUT 0'
+amixer -D hw:cainiaocniotcor cset name='FRDDR_B SINK 2 SEL' 'OUT 0'
+amixer -D hw:cainiaocniotcor cset name='FRDDR_B SINK 3 SEL' 'OUT 0'
+amixer -D hw:cainiaocniotcor cset name='FRDDR_B SRC 1 EN Switch' off
+amixer -D hw:cainiaocniotcor cset name='FRDDR_B SRC 2 EN Switch' off
+amixer -D hw:cainiaocniotcor cset name='FRDDR_B SRC 3 EN Switch' off
+amixer -D hw:cainiaocniotcor cset name='FRDDR_C SINK 1 SEL' 'OUT 0'
+amixer -D hw:cainiaocniotcor cset name='FRDDR_C SINK 2 SEL' 'OUT 0'
+amixer -D hw:cainiaocniotcor cset name='FRDDR_C SINK 3 SEL' 'OUT 0'
+amixer -D hw:cainiaocniotcor cset name='FRDDR_C SRC 1 EN Switch' off
+amixer -D hw:cainiaocniotcor cset name='FRDDR_C SRC 2 EN Switch' off
+amixer -D hw:cainiaocniotcor cset name='FRDDR_C SRC 3 EN Switch' off
+amixer -D hw:cainiaocniotcor cset name='TDMOUT_A Gain Enable Switch' off
+amixer -D hw:cainiaocniotcor cset name='TDMOUT_A Lane 0 Volume' 0
+amixer -D hw:cainiaocniotcor cset name='TDMOUT_A Lane 1 Volume' 0
+amixer -D hw:cainiaocniotcor cset name='TDMOUT_A Lane 2 Volume' 0
+amixer -D hw:cainiaocniotcor cset name='TDMOUT_A Lane 3 Volume' 0
+amixer -D hw:cainiaocniotcor cset name='TDMOUT_A SRC SEL' 'IN 0'
+amixer -D hw:cainiaocniotcor cset name='TDMOUT_B Gain Enable Switch' off
+amixer -D hw:cainiaocniotcor cset name='TDMOUT_B Lane 0 Volume' 0
+amixer -D hw:cainiaocniotcor cset name='TDMOUT_B Lane 1 Volume' 0
+amixer -D hw:cainiaocniotcor cset name='TDMOUT_B Lane 2 Volume' 0
+amixer -D hw:cainiaocniotcor cset name='TDMOUT_B Lane 3 Volume' 0
+amixer -D hw:cainiaocniotcor cset name='TDMOUT_B SRC SEL' 'IN 0'
+amixer -D hw:cainiaocniotcor cset name='TOACODEC Lane Select' 0
+amixer -D hw:cainiaocniotcor cset name='TOACODEC OUT EN Switch' off
+amixer -D hw:cainiaocniotcor cset name='TOACODEC SRC' 'I2S A'
+amixer -D hw:cainiaocniotcor cset name='TOHDMITX Switch' off
+amixer -D hw:cainiaocniotcor cset name='TOHDMITX I2S SRC' 'I2S A'
+amixer -D hw:cainiaocniotcor cset name='TOHDMITX SPDIF SRC' 'SPDIF A'
+```
+
+设置FRDDR_A到HDMI的音频路由：
+
+```
+# FRDDR_A -> TDMOUT_A -> TOHDMITX -> HDMI
+amixer -D hw:cainiaocniotcor cset name='FRDDR_A SINK 1 SEL' 'OUT 0'
+amixer -D hw:cainiaocniotcor cset name='FRDDR_A SRC 1 EN Switch' on
+amixer -D hw:cainiaocniotcor cset name='TDMOUT_A SRC SEL' 'IN 0'
+amixer -D hw:cainiaocniotcor cset name='TOHDMITX Switch' on
+amixer -D hw:cainiaocniotcor cset name='TOHDMITX I2S SRC' 'I2S A'
+```
+
+此时可以通过`aplay -D plughw:cainiaocniotcor,0 /usr/share/sounds/alsa/Front_Center.wav`向HDMI播放声音
+
+设置FRDDR_B到内置扬声器的音频路由：
+
+```
+# FRDDR_B -> TDMOUT_B -> TOACODEC -> ACODEC -> Internal Speaker
+amixer -D hw:cainiaocniotcor cset name='FRDDR_B SINK 1 SEL' 'OUT 1'
+amixer -D hw:cainiaocniotcor cset name='FRDDR_B SRC 1 EN Switch' on
+amixer -D hw:cainiaocniotcor cset name='TDMOUT_B SRC SEL' 'IN 1'
+amixer -D hw:cainiaocniotcor cset name='TOACODEC Lane Select' 0
+amixer -D hw:cainiaocniotcor cset name='TOACODEC OUT EN Switch' on
+amixer -D hw:cainiaocniotcor cset name='TOACODEC SRC' 'I2S B'
+amixer -D hw:cainiaocniotcor cset name='ACODEC Playback Volume' 255
+```
+
+此时可以通过`aplay -D plughw:cainiaocniotcor,1 /usr/share/sounds/alsa/Front_Center.wav`向内置扬声器播放声音，且与上面的HDMI音频通路互不影响，可以同时播放
+
+也可以设置FRDDR_A到HDMI和内置扬声器的音频路由：
+
+```
+# FRDDR_A -> TDMOUT_A -> TOHDMITX and TOACODEC -> HDMI and Internal Speaker
+amixer -D hw:cainiaocniotcor cset name='FRDDR_A SINK 1 SEL' 'OUT 0'
+amixer -D hw:cainiaocniotcor cset name='FRDDR_A SRC 1 EN Switch' on
+amixer -D hw:cainiaocniotcor cset name='TDMOUT_A SRC SEL' 'IN 0'
+amixer -D hw:cainiaocniotcor cset name='TOHDMITX Switch' on
+amixer -D hw:cainiaocniotcor cset name='TOHDMITX I2S SRC' 'I2S A'
+amixer -D hw:cainiaocniotcor cset name='TOACODEC Lane Select' 0
+amixer -D hw:cainiaocniotcor cset name='TOACODEC OUT EN Switch' on
+amixer -D hw:cainiaocniotcor cset name='TOACODEC SRC' 'I2S A'
+amixer -D hw:cainiaocniotcor cset name='ACODEC Playback Volume' 255
+```
+
+这样执行`aplay -D plughw:cainiaocniotcor,0 /usr/share/sounds/alsa/Front_Center.wav`，HDMI和内置扬声器会同时播放声音
+
+如果安装了桌面环境，会发现在系统设置里面往往只有一个模拟输出设备。因为该设备只有一张card，PipeWire/Pulse Audio并不会识别card的device。这时可以通过ALSA UCM来管理声音实例和音频路由
+
+首先通过`sudo apt install alsa-ucm-conf`安装ALSA UCM的通用配置。在`/usr/share/alsa/ucm2/ucm.conf`中存在：
+
+```
+# The probed path when hw-card is found:
+#
+#   ucm2/conf.d/[${CardDriver}|${KernelDriver}]/${CardLongName}.conf
+#   ucm2/conf.d/[${CardDriver}|${KernelDriver}]/[${CardDriver}|${KernelDriver}].conf
+#   ucm2/${KernelModule}/${KernelModule}.conf (obsolete)
+#   ucm2/${CardDriver}/${CardLongName}.conf (obsolete)
+#   ucm2/${CardDriver}/${CardDriver}.conf (obsolete)
+```
+
+通过`alsactl info`和`aplay -l`可以得到card的驱动名和声卡名分别为`axg-sound-card`和`cainiao-cniot-core`，结合上面ucm.conf中的注释，可以将ALSA UCM配置文件放在`/usr/share/alsa/ucm2/conf.d/axg-sound-card/cainiao-cniot-core.conf`
+
+[这里](https://github.com/armbian/build/tree/main/packages/bsp/cainiao-cniot-core)存在写好的ALSA UCM文件，将其放在`/usr/share/alsa/ucm2/Amlogic/axg-sound-card`目录下，并使用`ls -sfv /usr/share/alsa/ucm2/Amlogic/axg-sound-card/cainiao-cniot-core.conf /usr/share/alsa/ucm2/conf.d/axg-sound-card/cainiao-cniot-core.conf`创建符号连接即可完成配置文件的安装
+
+安装ALSA UCM配置文件后，在桌面环境的设置App里面便可以看到HDMI和Internal Speaker两个设备，可以随意切换，且可以同时使用
+
+如果要在CLI下使用ALSA UCM打开音频通路，可执行`alsactl init && alsaucm set _verb "HiFi" set _enadev "HDMI" set _enadev "Speaker"`
 
 ## 呼吸灯
 
